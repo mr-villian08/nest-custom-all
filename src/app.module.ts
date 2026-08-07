@@ -10,6 +10,7 @@ import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 import { APP_FILTER } from '@nestjs/core';
 import { HashModule } from './common/services/hash/hash.module';
+import { StorageModule } from './infrastructure/storage/storage.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HashModule } from './common/services/hash/hash.module';
     AuthModule,
     TokenModule,
     HashModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [
