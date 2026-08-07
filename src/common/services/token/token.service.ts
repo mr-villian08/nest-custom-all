@@ -4,8 +4,16 @@ import { JwtService } from '@nestjs/jwt';
 import { StringValue } from 'ms';
 
 export interface JwtPayload {
-  sub: number;
+  sub: string;
   email: string;
+  firstName: string;
+  lastName: string | null;
+  username: string;
+  role: {
+    id: string;
+    name: string;
+    slug: string;
+  };
 }
 
 @Injectable()

@@ -1,29 +1,78 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthLoginDto } from './dto/create-auth-login.dto';
 import { AuthRegisterDto } from './dto/create-auth-register.dto';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
-import * as bcrypt from 'bcryptjs';
+import { HashService } from '../../common/services/hash/hash.service';
+import { TokenService } from '../../common/services/token/token.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly hashService: HashService,
+    private readonly tokenService: TokenService,
+  ) {}
 
-  login(loginAuthDto: AuthLoginDto) {
-    return 'This action logs in a user';
-  }
-
-  async register(registerAuthDto: AuthRegisterDto) {
-    const exists = await this.prisma.user.findUnique({
+  // ? ****************************************** Login User ****************************************** */
+  async login(loginAuthDto: AuthLoginDto) {
+    const user = await this.prisma.user.findUnique({
       where: {
-        email: registerAuthDto.email,
+        email: loginAuthDto.email!,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        username: true,
+        password: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    if (exists) {
-      throw new BadRequestException('Email already exists.');
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password.');
     }
 
-    const passwordHash = await bcrypt.hash(registerAuthDto.password!, 10);
+    const isPasswordValid = this.hashService.compare(
+      loginAuthDto.password!,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password.');
+    }
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      role: user.roles[0]?.role,
+    };
+
+    const tokens = await this.tokenService.generateTokens(payload);
+
+    return {
+      user: payload,
+      tokens,
+    };
+  }
+
+  // ? ****************************************** Register User ****************************************** */
+  async register(registerAuthDto: AuthRegisterDto) {
+    const passwordHash = this.hashService.make(registerAuthDto.password!);
 
     const user = await this.prisma.user.create({
       data: {

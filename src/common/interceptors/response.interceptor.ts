@@ -7,28 +7,31 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface ApiResponse<T> {
-  status: boolean;
-  message?: string;
-  data: T;
-  timestamp: string;
-}
-
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<
-  T,
-  ApiResponse<T>
-> {
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler<T>,
-  ): Observable<ApiResponse<T>> {
+export class ResponseInterceptor<T> implements NestInterceptor<T, unknown> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
-      map((data: T): ApiResponse<T> => ({
-        status: true,
-        data,
-        timestamp: new Date().toISOString(),
-      })),
+      map((response: { message?: string; data?: T } | T) => {
+        if (
+          response &&
+          typeof response === 'object' &&
+          'message' in response &&
+          'data' in response
+        ) {
+          return {
+            status: true,
+            message: response.message,
+            data: response.data,
+            timestamp: new Date().toISOString(),
+          };
+        }
+
+        return {
+          status: true,
+          data: response,
+          timestamp: new Date().toISOString(),
+        };
+      }),
     );
   }
 }
