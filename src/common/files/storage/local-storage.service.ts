@@ -1,10 +1,11 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
-import { ConfigService } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
@@ -12,32 +13,22 @@ import * as path from 'node:path';
 import {
   StorageProvider,
   StorageUploadInput,
-} from '../interfaces/storage-provider.interface';
+} from '../../interfaces/storage-provider.interface';
 
-import { UploadedFile } from '../interfaces/uploaded-file.interface';
+import { UploadedFile } from '../../interfaces/uploaded-file.interface';
+import fileConfig from '../../../config/file.config';
 
 @Injectable()
 export class LocalStorageService implements StorageProvider {
-  private readonly rootDirectory: string;
-
-  private readonly serveUrl: string;
-
-  constructor(private readonly configService: ConfigService) {
-    this.rootDirectory = this.configService.get<string>(
-      'NODE_APP_FILES_ROOT',
-      'public',
-    );
-
-    this.serveUrl = this.configService.get<string>(
-      'NODE_APP_FILES_SERVE_URL',
-      '',
-    );
-  }
+  constructor(
+    @Inject(fileConfig.KEY)
+    private readonly config: ConfigType<typeof fileConfig>,
+  ) {}
 
   async upload(input: StorageUploadInput): Promise<UploadedFile> {
-    const safeFolder = this.normalizeFolder(input.folder);
+    const folder = this.normalizeFolder(input.folder);
 
-    const directory = path.join(process.cwd(), this.rootDirectory, safeFolder);
+    const directory = path.join(process.cwd(), this.config.root, folder);
 
     await fs.mkdir(directory, {
       recursive: true,
@@ -51,9 +42,7 @@ export class LocalStorageService implements StorageProvider {
       throw new InternalServerErrorException('Unable to save uploaded file');
     }
 
-    const relativePath = path
-      .join(this.rootDirectory, safeFolder, input.fileName)
-      .replace(/\\/g, '/');
+    const storagePath = `${folder}/${input.fileName}`;
 
     return {
       originalName: input.file.originalname,
@@ -64,9 +53,9 @@ export class LocalStorageService implements StorageProvider {
 
       size: input.file.size,
 
-      path: relativePath,
+      path: storagePath,
 
-      url: this.buildUrl(safeFolder, input.fileName),
+      url: this.getPublicUrl(storagePath),
     };
   }
 
@@ -76,7 +65,11 @@ export class LocalStorageService implements StorageProvider {
     try {
       await fs.unlink(filePath);
     } catch (error) {
-      if (this.isNodeError(error) && error.code === 'ENOENT') {
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        error.code === 'ENOENT'
+      ) {
         throw new NotFoundException('File does not exist');
       }
 
@@ -97,16 +90,18 @@ export class LocalStorageService implements StorageProvider {
   getAbsolutePath(folder: string, fileName: string): string {
     return path.join(
       process.cwd(),
-      this.rootDirectory,
+      this.config.root,
       this.normalizeFolder(folder),
       fileName,
     );
   }
 
-  private buildUrl(folder: string, fileName: string): string {
-    const baseUrl = this.serveUrl.replace(/\/+$/, '');
+  getPublicUrl(storagePath: string): string {
+    const baseUrl = this.config.serveUrl.replace(/\/+$/, '');
 
-    return `${baseUrl}/${folder}/${fileName}`;
+    const normalized = storagePath.replace(/\\/g, '/').replace(/^\/+/, '');
+
+    return `${baseUrl}/${normalized}`;
   }
 
   private normalizeFolder(folder: string): string {
@@ -115,14 +110,14 @@ export class LocalStorageService implements StorageProvider {
       .replace(/^\/+/, '')
       .replace(/\/+$/, '');
 
-    if (!normalized || normalized === '.' || normalized.includes('..')) {
+    if (
+      !normalized ||
+      normalized.includes('..') ||
+      path.posix.isAbsolute(normalized)
+    ) {
       throw new InternalServerErrorException('Invalid storage folder');
     }
 
     return normalized;
-  }
-
-  private isNodeError(error: unknown): error is NodeJS.ErrnoException {
-    return error instanceof Error;
   }
 }

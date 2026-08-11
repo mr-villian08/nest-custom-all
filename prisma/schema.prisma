@@ -16,12 +16,13 @@ datasource db {
 model User {
   id String @id @default(uuid())
 
-  firstName String
-  lastName  String?
-  email     String  @unique
-  username  String  @unique
-  password  String
-  phone     String  @unique
+  firstName    String
+  lastName     String?
+  email        String  @unique
+  username     String  @unique
+  password     String
+  phone        String  @unique
+  profileImage String?
 
   emailVerified   Boolean   @default(true)
   emailVerifiedAt DateTime?

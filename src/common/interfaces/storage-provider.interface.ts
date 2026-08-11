@@ -17,4 +17,6 @@ export interface StorageProvider {
   exists(folder: string, fileName: string): Promise<boolean>;
 
   getAbsolutePath(folder: string, fileName: string): string;
+
+  getPublicUrl(storagePath: string): string;
 }
