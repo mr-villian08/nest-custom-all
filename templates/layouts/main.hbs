@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>{{subject}}</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f8;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+      .header {
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        padding: 20px;
+        text-align: center;
+        color: #ffffff;
+        font-size: 22px;
+        font-weight: bold;
+      }
+      .content {
+        padding: 30px;
+        color: #374151;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      .otp {
+        margin: 30px 0;
+        text-align: center;
+        font-size: 32px;
+        letter-spacing: 8px;
+        font-weight: bold;
+        color: #4f46e5;
+      }
+      .footer {
+        padding: 20px;
+        font-size: 12px;
+        text-align: center;
+        color: #6b7280;
+        background-color: #f9fafb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        {{appName}}
+      </div>
+
+      <div class='content'>
+        {{{body}}}
+      </div>
+
+      <div class='footer'>
+        ©
+        {{year}}
+        {{appName}}. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>

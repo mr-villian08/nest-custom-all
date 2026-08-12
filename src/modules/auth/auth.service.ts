@@ -4,6 +4,7 @@ import { AuthRegisterDto } from './dto/create-auth-register.dto';
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { HashService } from '../../common/services/hash/hash.service';
 import { TokenService } from '../../common/services/token/token.service';
+// import { MailService } from '../../common/services/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
+    // private readonly mailService: MailService,
   ) {}
 
   // ? ****************************************** Login User ****************************************** */
@@ -94,6 +96,7 @@ export class AuthService {
       },
       select: {
         id: true,
+        username: true,
         email: true,
         firstName: true,
         lastName: true,
@@ -110,6 +113,16 @@ export class AuthService {
         createdAt: true,
       },
     });
+
+    // await this.mailService.sendEmail({
+    //   to: user.email,
+    //   subject: 'Welcome to Custom All',
+    //   template: 'welcome',
+    //   context: {
+    //     name: `${user.firstName} ${user.lastName}`,
+    //     email: user.email,
+    //   },
+    // });
 
     return user;
   }

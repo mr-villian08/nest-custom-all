@@ -9,7 +9,7 @@ import { Inject } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 
 import { fileTypeFromBuffer } from 'file-type';
-import fileConfig from '../../../config/file.config';
+import fileConfig from '../../../../config/file.config';
 
 @Injectable()
 export class FileValidationService {

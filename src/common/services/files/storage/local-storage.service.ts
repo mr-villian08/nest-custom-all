@@ -13,10 +13,10 @@ import * as path from 'node:path';
 import {
   StorageProvider,
   StorageUploadInput,
-} from '../../interfaces/storage-provider.interface';
+} from '../../../interfaces/storage-provider.interface';
 
-import { UploadedFile } from '../../interfaces/uploaded-file.interface';
-import fileConfig from '../../../config/file.config';
+import { UploadedFile } from '../../../interfaces/uploaded-file.interface';
+import fileConfig from '../../../../config/file.config';
 
 @Injectable()
 export class LocalStorageService implements StorageProvider {

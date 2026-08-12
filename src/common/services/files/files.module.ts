@@ -10,9 +10,9 @@ import { FileValidationService } from './validation/file-validation.service';
 
 import { MediaService } from './media/media.service';
 
-import fileConfig from '../../config/file.config';
+import fileConfig from '../../../config/file.config';
 
-import { STORAGE_PROVIDER } from '../constants/file.token';
+import { STORAGE_PROVIDER } from '../../constants/file.token';
 
 import { FilesController } from './files.controller';
 

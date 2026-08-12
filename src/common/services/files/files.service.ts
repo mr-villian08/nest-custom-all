@@ -6,17 +6,17 @@ import { randomUUID } from 'node:crypto';
 
 import * as path from 'node:path';
 
-import type { StorageProvider } from '../interfaces/storage-provider.interface';
+import type { StorageProvider } from '../../interfaces/storage-provider.interface';
 
-import { UploadedFile } from '../interfaces/uploaded-file.interface';
+import { UploadedFile } from '../../interfaces/uploaded-file.interface';
 
 import { FileValidationService } from './validation/file-validation.service';
 
 import { MediaService } from './media/media.service';
 
-import { STORAGE_PROVIDER } from '../constants/file.token';
+import { STORAGE_PROVIDER } from '../../constants/file.token';
 
-import fileConfig from '../../config/file.config';
+import fileConfig from '../../../config/file.config';
 
 export interface UploadOptions {
   folder: string;
