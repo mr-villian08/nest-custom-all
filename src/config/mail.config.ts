@@ -1,32 +1,6 @@
 import { registerAs } from '@nestjs/config';
-
-const parseNumber = (value: string | undefined, fallback: number): number => {
-  const parsed = Number(value);
-
-  return Number.isFinite(parsed) ? parsed : fallback;
-};
-
-const parseBoolean = (
-  value: string | undefined,
-  fallback: boolean,
-): boolean => {
-  if (value === undefined) {
-    return fallback;
-  }
-
-  return value.toLowerCase() === 'true';
-};
-
-const parseList = (value: string | undefined): string[] => {
-  if (!value) {
-    return [];
-  }
-
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean);
-};
+import { parseNumber } from '../common/helpers/number.helper';
+import { parseBoolean, parseList } from '../common/helpers/string.helper';
 
 export default registerAs('mail', () => ({
   smtp: {

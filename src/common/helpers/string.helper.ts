@@ -29,3 +29,27 @@ export const singularize = (word: string): string => {
     (match) => endings[match],
   );
 };
+
+// ? ************************** Parse the list (to array) ************************** */
+export const parseList = (value: string | undefined): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return value
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+};
+
+// ? *************************** Parse the boolean value *************************** */
+export const parseBoolean = (
+  value: string | undefined,
+  fallback: boolean,
+): boolean => {
+  if (value === undefined) {
+    return fallback;
+  }
+
+  return value.toLowerCase() === 'true';
+};
