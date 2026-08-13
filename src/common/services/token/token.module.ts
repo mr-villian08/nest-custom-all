@@ -7,7 +7,8 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [
     ConfigModule,
     JwtModule.registerAsync({
-      imports: [ConfigService],
+      imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('jwt.secret'),
         expiresIn: config.getOrThrow<string>('jwt.accessTokenExpiresIn'),

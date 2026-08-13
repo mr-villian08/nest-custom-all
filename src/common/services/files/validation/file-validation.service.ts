@@ -8,7 +8,6 @@ import { Inject } from '@nestjs/common';
 
 import type { ConfigType } from '@nestjs/config';
 
-import { fileTypeFromBuffer } from 'file-type';
 import fileConfig from '../../../../config/file.config';
 
 @Injectable()
@@ -68,6 +67,7 @@ export class FileValidationService {
     file: Express.Multer.File,
     requestedMimeType: string,
   ): Promise<void> {
+    const { fileTypeFromBuffer } = await import('file-type');
     const detected = await fileTypeFromBuffer(file.buffer);
 
     /*
