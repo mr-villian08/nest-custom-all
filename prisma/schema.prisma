@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ? ******************************** Users ************************************* */
+model User {
+  id String @id @default(uuid())
+
+  firstName    String
+  lastName     String?
+  email        String  @unique
+  username     String  @unique
+  password     String
+  phone        String  @unique
+  profileImage String?
+
+  emailVerified   Boolean   @default(true)
+  emailVerifiedAt DateTime?
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  sessions  Session[]
+  roles     UserRole[]
+
+  @@map("users")
+}
+
+// ? ******************************** Roles ************************************* */
+model Role {
+  id String @id @default(uuid())
+
+  name        String  @unique
+  slug        String  @unique
+  description String?
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+// ? ******************************** User Role Associations ************************************* */
+model UserRole {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+// ? ******************************** Sessions ************************************* */
+model Session {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  token     String   @unique
+  expiresAt DateTime
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("sessions")
+}

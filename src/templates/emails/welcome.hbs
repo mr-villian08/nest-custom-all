@@ -1,0 +1,81 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Welcome to Cappuccino</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        background: #ffffff;
+        margin: auto;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        color: #333;
+      }
+      .credentials {
+        background: #f9fafb;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+      }
+      .credentials p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 15px;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class='container'>
+      <h2 class='header'>Welcome to Cappuccino 🎉</h2>
+
+      <p>Hi {{name}},</p>
+
+      <p>
+        Your account has been created. Below are your login details:
+      </p>
+
+      <div class='credentials'>
+        <p><strong>Email:</strong> {{email}}</p>
+        <p><strong>Password:</strong> {{password}}</p>
+      </div>
+
+      <p>
+        Please login and change your password immediately for security reasons.
+      </p>
+
+      <a href='{{loginUrl}}' target='_blank' class='button'>Login Now</a>
+
+      <p style='margin-top:20px;'>
+        If you did not expect this account, please contact support.
+      </p>
+
+      <div class='footer'>
+        <p>© {{year}} Cappuccino. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
