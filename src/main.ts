@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  const PORT = process.env.NODE_APP_PORT ?? 8001;
 
   const config = new DocumentBuilder()
     .setTitle('Custom All')
@@ -39,6 +41,11 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  await app.listen(process.env.NODE_APP_PORT ?? 3000);
+  await app.listen(PORT);
+
+  Logger.log(
+    `Compiled successfully on port: \x1b[34m${PORT}\x1b[0m`,
+    'NestApplication',
+  );
 }
 bootstrap();

@@ -9,6 +9,8 @@ import { TokenModule } from './common/services/token/token.module';
 import { PrismaModule } from './infrastructure/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import configuration from './config';
+import { APP_FILTER } from '@nestjs/core';
+import { PrismaExceptionFilter } from './common/filters/prisma.exception.filter';
 
 @Module({
   imports: [
@@ -24,6 +26,12 @@ import configuration from './config';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: PrismaExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

@@ -1,6 +1,10 @@
 import { Prisma } from '../../generated/prisma/client';
 import { uppercaseFirst } from '../helpers/string.helper';
 
+interface PrismaP2025Meta {
+  cause?: string;
+}
+
 export function getUniqueConstraintField(
   exception: Prisma.PrismaClientKnownRequestError,
 ): string {
@@ -37,4 +41,28 @@ export function getUniqueConstraintField(
   }
 
   return 'field';
+}
+
+export function getRecordNotFoundField(
+  exception: Prisma.PrismaClientKnownRequestError,
+): string | null {
+  const meta = exception.meta as PrismaP2025Meta | undefined;
+
+  const cause = meta?.cause ?? exception.message;
+
+  /**
+   * Example Prisma message:
+   *
+   * No 'Role' record(s) was found
+   * for a nested connect on one-to-many relation 'RoleToUser'.
+   *
+   * Extracts: Role
+   */
+  const modelMatch = cause.match(/No '([^']+)' record/);
+
+  if (modelMatch) {
+    return uppercaseFirst(modelMatch[1]);
+  }
+
+  return null;
 }

@@ -10,10 +10,14 @@ import { AuthService } from './auth.service';
 import { AuthLoginDto } from './dto/create-auth-login.dto';
 import { AuthRegisterDto } from './dto/create-auth-register.dto';
 import type { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -23,11 +27,20 @@ export class AuthController {
   ) {
     const { user, tokens } = await this.authService.login(loginDto);
 
-    res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_APP_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24 * 30,
+    const { name, httpOnly, secure, sameSite, maxAge } =
+      this.configService.getOrThrow<{
+        name: string;
+        httpOnly: boolean;
+        secure: boolean;
+        sameSite: 'lax' | 'strict' | 'none';
+        maxAge: number;
+      }>('cookie.refreshToken');
+
+    res.cookie(name, tokens.refreshToken, {
+      httpOnly,
+      secure,
+      sameSite,
+      maxAge,
     });
 
     return {
