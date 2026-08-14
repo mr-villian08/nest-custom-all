@@ -4,7 +4,7 @@ import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { HashService } from '../../common/services/hash/hash.service';
 import { TokenService } from '../../common/services/token/token.service';
 import { AuthRegisterDto } from './dto/create-auth-register.dto';
-// import { MailService } from '../../common/services/mail/mail.service';
+// import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
-    // private readonly mailService: MailService,
+    // private readonly mailerService: MailerService,
   ) {}
 
   // ? ****************************************** Login User ****************************************** */
@@ -114,7 +114,7 @@ export class AuthService {
       },
     });
 
-    // await this.mailService.sendEmail({
+    // await this.mailerService.sendMail({
     //   to: user.email,
     //   subject: 'Welcome to Custom All',
     //   template: 'welcome',
