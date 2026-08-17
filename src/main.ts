@@ -48,4 +48,4 @@ async function bootstrap() {
     'NestApplication',
   );
 }
-bootstrap();
+bootstrap().catch(() => process.exit(1));

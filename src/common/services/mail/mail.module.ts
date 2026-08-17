@@ -1,47 +1,55 @@
 import path from 'node:path';
 import { Module } from '@nestjs/common';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 
 @Module({
   imports: [
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.NODE_APP_MAIL_HOST,
-        port: Number(process.env.NODE_APP_MAIL_PORT),
-        secure: process.env.NODE_APP_MAIL_SECURE === 'true',
-        auth: {
-          user: process.env.NODE_APP_MAIL_USER,
-          pass: process.env.NODE_APP_MAIL_PASS,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService): MailerOptions => ({
+        transport: {
+          host: configService.getOrThrow<string>('mail.smtp.host'),
+          port: configService.getOrThrow<number>('mail.smtp.port'),
+          secure: configService.getOrThrow<boolean>('mail.smtp.secure'),
+          auth: {
+            user: configService.getOrThrow<string>('mail.smtp.user'),
+            pass: configService.getOrThrow<string>('mail.smtp.password'),
+          },
+          tls: {
+            rejectUnauthorized: configService.getOrThrow<boolean>(
+              'mail.smtp.rejectUnauthorized',
+            ),
+          },
         },
-        tls: {
-          rejectUnauthorized:
-            process.env.NODE_APP_MAIL_TLS_REJECT_UNAUTHORIZED === 'true',
+        defaults: {
+          from: {
+            name: configService.getOrThrow<string>('mail.from.name'),
+            address: configService.getOrThrow<string>('mail.from.address'),
+          },
+          cc: configService.get<string[]>('mail.defaults.cc'),
+          bcc: configService.get<string[]>('mail.defaults.bcc'),
         },
-      },
-      defaults: {
-        from: {
-          name: process.env.NODE_APP_MAIL_FROM_NAME!,
-          address: process.env.NODE_APP_MAIL_FROM_ADDRESS!,
-        },
-      },
-      template: {
-        dir: path.join(process.cwd(), 'templates'),
-        adapter: new HandlebarsAdapter(),
-        options: {
-          strict: true,
-        },
-      },
-      options: {
-        partials: {
+        template: {
           dir: path.join(process.cwd(), 'templates', 'emails'),
+          adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
+          },
+        },
+        options: {
+          partials: {
+            dir: path.join(process.cwd(), 'templates', 'emails'),
+            options: {
+              strict: true,
+            },
           },
           defaultLayout: 'main',
           viewsDir: path.join(process.cwd(), 'templates', 'emails'),
         },
-      },
+      }),
     }),
   ],
 })

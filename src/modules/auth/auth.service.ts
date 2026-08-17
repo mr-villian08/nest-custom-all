@@ -4,7 +4,7 @@ import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { HashService } from '../../common/services/hash/hash.service';
 import { TokenService } from '../../common/services/token/token.service';
 import { AuthRegisterDto } from './dto/create-auth-register.dto';
-// import { MailerService } from '@nestjs-modules/mailer';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
-    // private readonly mailerService: MailerService,
+    private readonly mailerService: MailerService,
   ) {}
 
   // ? ****************************************** Login User ****************************************** */
@@ -114,15 +114,18 @@ export class AuthService {
       },
     });
 
-    // await this.mailerService.sendMail({
-    //   to: user.email,
-    //   subject: 'Welcome to Custom All',
-    //   template: 'welcome',
-    //   context: {
-    //     name: `${user.firstName} ${user.lastName}`,
-    //     email: user.email,
-    //   },
-    // });
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Welcome to Custom All',
+      template: 'welcome',
+      context: {
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        password: registerAuthDto.password,
+        loginUrl: process.env.NODE_APP_LOGIN_URL,
+        year: new Date().getUTCFullYear(),
+      },
+    });
 
     return user;
   }
